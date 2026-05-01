@@ -6,6 +6,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+
 @Component
 public class ReminderModelToEntityConverter implements Converter<ReminderModel, Reminder> {
 
@@ -18,6 +23,17 @@ public class ReminderModelToEntityConverter implements Converter<ReminderModel, 
         reminder.setDescription(source.getDescription());
         reminder.setReminderDate(source.getReminderDate());
         reminder.setReminderTime(source.getReminderTime());
+
+        if (source.getReminderDate() != null && source.getReminderTime() != null) {
+            LocalTime timeWithoutSeconds = source.getReminderTime().truncatedTo(ChronoUnit.MINUTES);
+            Instant remindAt = source.getReminderDate()
+                    .atTime(source.getReminderTime())
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant();
+            reminder.setRemindAt(remindAt);
+            reminder.setReminderTime(timeWithoutSeconds);
+        }
+
         reminder.setPriority(source.getPriority());
         reminder.setStatus(source.getStatus() != null ? source.getStatus() : com.notescloud.reminderservice.enums.Status.PENDING);
         reminder.setNotifyInApp(source.isNotifyInApp());

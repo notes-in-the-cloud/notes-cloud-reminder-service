@@ -43,6 +43,9 @@ public class Reminder {
     @Column(name = "reminder_time", nullable = false)
     private LocalTime reminderTime;
 
+    @Column(name = "remind_at", nullable = false)
+    private Instant remindAt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Priority priority;
