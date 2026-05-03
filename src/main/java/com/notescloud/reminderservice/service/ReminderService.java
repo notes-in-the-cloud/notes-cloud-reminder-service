@@ -70,7 +70,6 @@ public class ReminderService {
             existing.setStatus(model.getStatus());
         }
         existing.setNotifyInApp(model.isNotifyInApp());
-        existing.setNotifyEmail(model.isNotifyEmail());
         existing.setNotifyPush(model.isNotifyPush());
 
         var saved = reminderRepository.save(existing);

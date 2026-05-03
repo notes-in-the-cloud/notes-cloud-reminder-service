@@ -1,5 +1,6 @@
 package com.notescloud.reminderservice.service;
 
+import com.notescloud.reminderservice.entity.Notification;
 import com.notescloud.reminderservice.entity.Reminder;
 import com.notescloud.reminderservice.enums.Status;
 import com.notescloud.reminderservice.repository.ReminderRepository;
@@ -21,6 +22,8 @@ public class SchedulerService {
     private static final int BATCH_SIZE = 100;
 
     private final ReminderRepository reminderRepository;
+    private final NotificationDispatcher notificationDispatcher;
+    private final NotificationService notificationService;
 
     // Polling-based scheduler. Under heavy load (thousands of due reminders
     // at the same minute), firing may span multiple ticks - acceptable for
@@ -66,8 +69,17 @@ public class SchedulerService {
                 reminder.getDescription(),
                 reminder.getPriority());
 
+        // Update status FIRST, then dispatch notification.
+        // This way if dispatch fails, reminder is still marked FIRED
+        // and won't be retried infinitely.
         reminder.setStatus(Status.FIRED);
         reminderRepository.save(reminder);
+
+        Notification notification = notificationService.createFromReminder(reminder);
+
+        // Dispatch notification through WebSocker
+        notificationDispatcher.dispatchToUser(reminder, notification.getId());
+
     }
 
 }
