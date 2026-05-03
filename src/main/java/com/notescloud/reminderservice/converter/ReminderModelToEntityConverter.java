@@ -37,7 +37,6 @@ public class ReminderModelToEntityConverter implements Converter<ReminderModel, 
         reminder.setPriority(source.getPriority());
         reminder.setStatus(source.getStatus() != null ? source.getStatus() : com.notescloud.reminderservice.enums.Status.PENDING);
         reminder.setNotifyInApp(source.isNotifyInApp());
-        reminder.setNotifyEmail(source.isNotifyEmail());
         reminder.setNotifyPush(source.isNotifyPush());
         return reminder;
     }
