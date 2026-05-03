@@ -57,9 +57,6 @@ public class Reminder {
     @Column(name = "notify_in_app", nullable = false)
     private boolean notifyInApp = true;
 
-    @Column(name = "notify_email", nullable = false)
-    private boolean notifyEmail = false;
-
     @Column(name = "notify_push", nullable = false)
     private boolean notifyPush = false;
 

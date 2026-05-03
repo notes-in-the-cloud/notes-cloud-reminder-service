@@ -22,7 +22,6 @@ public class ReminderView {
     private Priority priority;
     private Status status;
     private boolean notifyInApp;
-    private boolean notifyEmail;
     private boolean notifyPush;
     private Instant createdAt;
     private Instant updatedAt;
