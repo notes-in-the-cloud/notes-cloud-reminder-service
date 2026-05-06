@@ -23,6 +23,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.NOT_FOUND, e.getMessage(), req);
     }
 
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotificationNotFound(
+            NotificationNotFoundException e, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, e.getMessage(), req);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
             MethodArgumentNotValidException e, HttpServletRequest req) {
