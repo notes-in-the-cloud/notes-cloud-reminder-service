@@ -1,5 +1,6 @@
 package com.notescloud.reminderservice.controller;
 
+import com.notescloud.reminderservice.enums.ReminderFilter;
 import com.notescloud.reminderservice.model.ReminderModel;
 import com.notescloud.reminderservice.service.ReminderService;
 import com.notescloud.reminderservice.view.ReminderView;
@@ -10,15 +11,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/reminders")
+@RequestMapping("/api/users/{userId}/reminders")
 @RequiredArgsConstructor
 public class ReminderController {
 
@@ -26,8 +27,8 @@ public class ReminderController {
 
     @PostMapping
     public ReminderView create(
-            @RequestHeader("X-User-Id") UUID userId,
-            @RequestBody ReminderModel model){
+            @PathVariable UUID userId,
+            @RequestBody ReminderModel model) {
 
         model.setUserId(userId);
         model.setId(null);
@@ -36,40 +37,38 @@ public class ReminderController {
 
     @PutMapping
     public ReminderView update(
-            @RequestHeader("X-User-Id") UUID userId,
-            @RequestBody ReminderModel model){
+            @PathVariable UUID userId,
+            @RequestBody ReminderModel model) {
 
         model.setUserId(userId);
         return reminderService.update(model);
     }
 
-    @GetMapping()
-    public List<ReminderView> getAllRemindersForUser(@RequestHeader("X-User-Id") UUID userId){
-        return reminderService.getAllForUser(userId);
-    }
+    @GetMapping
+    public List<ReminderView> getReminders(
+            @PathVariable UUID userId,
+            @RequestParam(required = false) ReminderFilter status) {
 
-    @GetMapping("/completed")
-    public List<ReminderView> getAllCompletedRemindersForUser(@RequestHeader("X-User-Id") UUID userId){
-        return reminderService.getCompletedForUser(userId);
-    }
-
-    @GetMapping("/pending")
-    public List<ReminderView> getAllPendingRemindersForUser(@RequestHeader("X-User-Id") UUID userId){
-        return reminderService.getPendingForUser(userId);
+        if (status == null) {
+            return reminderService.getAllForUser(userId);
+        }
+        return switch (status) {
+            case PENDING   -> reminderService.getPendingForUser(userId);
+            case COMPLETED -> reminderService.getCompletedForUser(userId);
+        };
     }
 
     @GetMapping("/{id}")
     public ReminderView getById(
-            @RequestHeader("X-User-Id") UUID userId,
-            @PathVariable UUID id){
+            @PathVariable UUID userId,
+            @PathVariable UUID id) {
         return reminderService.getById(id, userId);
     }
 
     @DeleteMapping("/{id}")
     public void delete(
-            @RequestHeader("X-User-Id") UUID userId,
-            @PathVariable UUID id){
+            @PathVariable UUID userId,
+            @PathVariable UUID id) {
         reminderService.delete(id, userId);
     }
-
 }

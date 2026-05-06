@@ -1,6 +1,7 @@
 package com.notescloud.reminderservice.converter;
 
 import com.notescloud.reminderservice.entity.Reminder;
+import com.notescloud.reminderservice.enums.Status;
 import com.notescloud.reminderservice.model.ReminderModel;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
@@ -27,7 +28,7 @@ public class ReminderModelToEntityConverter implements Converter<ReminderModel, 
         if (source.getReminderDate() != null && source.getReminderTime() != null) {
             LocalTime timeWithoutSeconds = source.getReminderTime().truncatedTo(ChronoUnit.MINUTES);
             Instant remindAt = source.getReminderDate()
-                    .atTime(source.getReminderTime())
+                    .atTime(timeWithoutSeconds)
                     .atZone(ZoneId.systemDefault())
                     .toInstant();
             reminder.setRemindAt(remindAt);
@@ -35,7 +36,7 @@ public class ReminderModelToEntityConverter implements Converter<ReminderModel, 
         }
 
         reminder.setPriority(source.getPriority());
-        reminder.setStatus(source.getStatus() != null ? source.getStatus() : com.notescloud.reminderservice.enums.Status.PENDING);
+        reminder.setStatus(source.getStatus() != null ? source.getStatus() : Status.PENDING);
         reminder.setNotifyInApp(source.isNotifyInApp());
         return reminder;
     }
