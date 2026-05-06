@@ -23,13 +23,7 @@ public class NotificationService {
 
     @Transactional
     public Notification createFromReminder(Reminder reminder) {
-        Notification notification = new Notification();
-        notification.setUserId(reminder.getUserId());
-        notification.setReminderId(reminder.getId());
-        notification.setHeading(reminder.getHeading());
-        notification.setMessage(reminder.getDescription());
-        notification.setPriority(reminder.getPriority());
-        notification.setRead(false);
+        Notification notification = conversionService.convert(reminder, Notification.class);
         return notificationRepository.save(notification);
     }
 
