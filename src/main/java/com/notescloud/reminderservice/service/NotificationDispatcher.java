@@ -26,7 +26,7 @@ public class NotificationDispatcher {
         }
 
         NotificationPayload payload = NotificationPayload.builder()
-                .notificationId(notificationId)        // NEW
+                .notificationId(notificationId)
                 .reminderId(reminder.getId())
                 .heading(reminder.getHeading())
                 .message(reminder.getDescription())

@@ -32,7 +32,7 @@ public class Notification {
     @Column(name = "reminder_id", nullable = false)
     private UUID reminderId;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String heading;
 
     @Column(columnDefinition = "TEXT")

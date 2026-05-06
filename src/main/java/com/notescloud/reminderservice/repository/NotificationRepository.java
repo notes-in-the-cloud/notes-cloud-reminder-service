@@ -24,5 +24,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
             SET n.read = true, n.readAt = :readAt
             WHERE n.userId = :userId AND n.read = false
             """)
-    int markAllAsReadForUser(@Param("userId") UUID userId, @Param("readAt") Instant readAt);
+    void markAllAsReadForUser(@Param("userId") UUID userId, @Param("readAt") Instant readAt);
+
+    void deleteByUserId(UUID userId);
 }

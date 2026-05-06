@@ -69,17 +69,11 @@ public class SchedulerService {
                 reminder.getDescription(),
                 reminder.getPriority());
 
-        // Update status FIRST, then dispatch notification.
-        // This way if dispatch fails, reminder is still marked FIRED
-        // and won't be retried infinitely.
         reminder.setStatus(Status.FIRED);
         reminderRepository.save(reminder);
 
         Notification notification = notificationService.createFromReminder(reminder);
-
-        // Dispatch notification through WebSocker
         notificationDispatcher.dispatchToUser(reminder, notification.getId());
-
     }
 
 }

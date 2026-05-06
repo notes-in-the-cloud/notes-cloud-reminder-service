@@ -21,7 +21,6 @@ public class ReminderEntityToViewConverter implements Converter<Reminder, Remind
         view.setPriority(source.getPriority());
         view.setStatus(source.getStatus());
         view.setNotifyInApp(source.isNotifyInApp());
-        view.setNotifyPush(source.isNotifyPush());
         view.setCreatedAt(source.getCreatedAt());
         view.setUpdatedAt(source.getUpdatedAt());
         return view;

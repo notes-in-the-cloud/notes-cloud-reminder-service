@@ -6,7 +6,6 @@ import com.notescloud.reminderservice.exception.NotificationNotFoundException;
 import com.notescloud.reminderservice.repository.NotificationRepository;
 import com.notescloud.reminderservice.view.NotificationView;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -23,10 +21,6 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ConversionService conversionService;
 
-    /**
-     * Creates a notification record from a fired reminder.
-     * Called internally by the scheduler when firing reminders.
-     */
     @Transactional
     public Notification createFromReminder(Reminder reminder) {
         Notification notification = new Notification();
@@ -79,9 +73,12 @@ public class NotificationService {
     }
 
     @Transactional
-    public int markAllAsReadForUser(UUID userId) {
-        int count = notificationRepository.markAllAsReadForUser(userId, Instant.now());
-        log.info("Marked {} notifications as read for user {}", count, userId);
-        return count;
+    public void markAllAsReadForUser(UUID userId) {
+        notificationRepository.markAllAsReadForUser(userId, Instant.now());
+    }
+
+    @Transactional
+    public void deleteAllForUser(UUID userId) {
+        notificationRepository.deleteByUserId(userId);
     }
 }

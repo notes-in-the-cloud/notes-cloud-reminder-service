@@ -18,5 +18,5 @@ public class NotificationPayload {
     private String message;
     private Priority priority;
     private Instant firedAt;
-    private String type; // "REMINDER_FIRED" - за бъдеща extensibility
+    private String type;
 }

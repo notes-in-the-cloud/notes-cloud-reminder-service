@@ -21,5 +21,4 @@ public class ReminderModel {
     private Priority priority;
     private Status status;
     private boolean notifyInApp;
-    private boolean notifyPush;
 }
