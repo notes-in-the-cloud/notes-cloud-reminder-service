@@ -17,42 +17,41 @@ springdoc:
     path: /v3/api-docs
 
 ---
+# === Local profile (PostgreSQL via kubectl port-forward) ===
+# Prerequisites:
+#   1. kubectl port-forward -n notes-cloud svc/postgres 5432:5432
+#   2. CREATE SCHEMA IF NOT EXISTS reminder; (веднъж след setup.ps1)
 spring:
   config:
     activate:
       on-profile: local
 
   datasource:
-    url: jdbc:h2:mem:reminders;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://localhost:5432/notes_cloud
+    driver-class-name: org.postgresql.Driver
+    username: notes_cloud_user
+    password: notes_cloud_password
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
-        dialect: org.hibernate.dialect.H2Dialect
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: reminder
+        format_sql: true
 
 ---
+# === Prod profile (PostgreSQL, used in Kubernetes) ===
+#
+# DB connection is built by DataSourceConfig from DatabaseProperties.
+# Env vars come from postgres-config (ConfigMap) and postgres-secret (Secret)
+# via envFrom in the deployment manifest.
 spring:
   config:
     activate:
       on-profile: prod
-
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/reminders_db}
-    driver-class-name: org.postgresql.Driver
-    username: ${DB_USERNAME:reminders_user}
-    password: ${DB_PASSWORD:changeme}
 
   jpa:
     hibernate:
@@ -61,3 +60,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: reminder
+        format_sql: false
+
+app:
+  database:
+    host: ${DB_HOST:postgres}
+    port: ${DB_PORT:5432}
+    name: ${POSTGRES_DB}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
