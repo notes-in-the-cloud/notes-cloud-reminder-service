@@ -8,6 +8,10 @@ spring:
 server:
   port: 8084
 
+gateway:
+  base-url: ${GATEWAY_BASE_URL:http://localhost:8090}
+  internal-token: ${GATEWAY_INTERNAL_TOKEN:}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
