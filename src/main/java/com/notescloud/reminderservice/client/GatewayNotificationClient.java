@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClientException;
 public class GatewayNotificationClient {
 
     private static final String INTERNAL_TOKEN_HEADER = "X-Internal-Token";
-    private static final String PUSH_NOTIFICATION_PATH = "/internal/notifications/push";
+    private static final String PUSH_NOTIFICATION_PATH = "/internal/notifications/{userId}";
 
     private final RestClient restClient;
     private final GatewayProperties gatewayProperties;
@@ -27,7 +27,7 @@ public class GatewayNotificationClient {
     public void pushNotification(GatewayNotificationPushRequest request) {
         try {
             restClient.post()
-                .uri(PUSH_NOTIFICATION_PATH)
+                .uri(PUSH_NOTIFICATION_PATH, request.userId())
                 .header(INTERNAL_TOKEN_HEADER, gatewayProperties.internalToken())
                 .body(request)
                 .retrieve()
