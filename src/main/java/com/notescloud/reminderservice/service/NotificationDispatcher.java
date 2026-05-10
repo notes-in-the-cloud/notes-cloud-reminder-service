@@ -1,11 +1,11 @@
 package com.notescloud.reminderservice.service;
 
+import com.notescloud.reminderservice.client.GatewayNotificationClient;
 import com.notescloud.reminderservice.entity.Reminder;
-import com.notescloud.reminderservice.view.NotificationPayload;
+import com.notescloud.reminderservice.view.GatewayNotificationPushRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -15,9 +15,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationDispatcher {
 
-    private static final String NOTIFICATION_DESTINATION_PREFIX = "/topic/notifications/";
+    private static final String NOTIFICATION_TYPE = "REMINDER_FIRED";
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final GatewayNotificationClient gatewayNotificationClient;
 
     public void dispatchToUser(Reminder reminder, UUID notificationId) {
         if (!reminder.isNotifyInApp()) {
@@ -25,22 +25,22 @@ public class NotificationDispatcher {
             return;
         }
 
-        NotificationPayload payload = NotificationPayload.builder()
-                .notificationId(notificationId)
-                .reminderId(reminder.getId())
-                .heading(reminder.getHeading())
-                .message(reminder.getDescription())
-                .priority(reminder.getPriority())
-                .firedAt(Instant.now())
-                .type("REMINDER_FIRED")
-                .build();
+        GatewayNotificationPushRequest request = new GatewayNotificationPushRequest(
+            reminder.getUserId(),
+            notificationId,
+            reminder.getId(),
+            reminder.getHeading(),
+            reminder.getDescription(),
+            reminder.getPriority(),
+            Instant.now(),
+            NOTIFICATION_TYPE
+        );
 
-        String userId = reminder.getUserId().toString();
+        gatewayNotificationClient.pushNotification(request);
 
-        messagingTemplate.convertAndSend(NOTIFICATION_DESTINATION_PREFIX + userId, payload);
-
-        log.info("Pushed notification {} to user {} for reminder {}",
-                notificationId, userId, reminder.getId());
+        log.info("Requested gateway push for notification {} to user {} for reminder {}",
+            notificationId,
+            reminder.getUserId(),
+            reminder.getId());
     }
-
 }
