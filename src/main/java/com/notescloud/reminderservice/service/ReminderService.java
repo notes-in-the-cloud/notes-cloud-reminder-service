@@ -1,5 +1,6 @@
 package com.notescloud.reminderservice.service;
 
+import com.notescloud.reminderservice.config.ReminderProperties;
 import com.notescloud.reminderservice.entity.Reminder;
 import com.notescloud.reminderservice.enums.Status;
 import com.notescloud.reminderservice.exception.ReminderNotFoundException;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -22,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReminderService {
 
+    private final ReminderProperties reminderProperties;
     private final ReminderRepository reminderRepository;
     private final ConversionService conversionService;
 
@@ -57,9 +60,9 @@ public class ReminderService {
         if (model.getReminderDate() != null || model.getReminderTime() != null) {
             LocalTime timeWithoutSeconds = existing.getReminderTime().truncatedTo(ChronoUnit.MINUTES);
             Instant remindAt = existing.getReminderDate()
-                    .atTime(timeWithoutSeconds)
-                    .atZone(ZoneId.systemDefault())
-                    .toInstant();
+                .atTime(timeWithoutSeconds)
+                .atZone(resolveZone(model.getTimezone()))
+                .toInstant();
             existing.setRemindAt(remindAt);
             existing.setReminderTime(timeWithoutSeconds);
         }
@@ -69,7 +72,9 @@ public class ReminderService {
         if (model.getStatus() != null) {
             existing.setStatus(model.getStatus());
         }
-        existing.setNotifyInApp(model.isNotifyInApp());
+        if (model.getNotifyInApp() != null) {
+            existing.setNotifyInApp(model.getNotifyInApp());
+        }
 
         var saved = reminderRepository.save(existing);
         return conversionService.convert(saved, ReminderView.class);
@@ -123,4 +128,17 @@ public class ReminderService {
         reminderRepository.delete(reminder);
     }
 
+    private ZoneId resolveZone(String timezone) {
+        String fallbackTimezone = reminderProperties.timezone();
+
+        if (timezone == null || timezone.isBlank()) {
+            return ZoneId.of(fallbackTimezone);
+        }
+
+        try {
+            return ZoneId.of(timezone);
+        } catch (DateTimeException ex) {
+            return ZoneId.of(fallbackTimezone);
+        }
+    }
 }

@@ -12,6 +12,9 @@ gateway:
   base-url: ${GATEWAY_BASE_URL:http://localhost:8090}
   internal-token: ${GATEWAY_INTERNAL_TOKEN:}
 
+reminder:
+  timezone: ${REMINDER_TIMEZONE:Europe/Sofia}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
