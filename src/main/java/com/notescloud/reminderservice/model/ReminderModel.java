@@ -20,5 +20,6 @@ public class ReminderModel {
     private LocalTime reminderTime;
     private Priority priority;
     private Status status;
-    private boolean notifyInApp;
+    private Boolean notifyInApp;
+    private String timezone;
 }

@@ -6,7 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties({
     DatabaseProperties.class,
-    GatewayProperties.class
+    GatewayProperties.class,
+    ReminderProperties.class
 })
 public class PropertiesConfig {
 }
